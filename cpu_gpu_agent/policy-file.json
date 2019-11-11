@@ -1,0 +1,85 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "autoscaling:Describe*",
+                "cloudwatch:*",
+                "logs:*",
+                "sns:*",
+                "iam:GetPolicy",
+                "iam:GetPolicyVersion",
+                "iam:GetRole"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "arn:aws:iam::*:role/aws-service-role/events.amazonaws.com/AWSServiceRoleForCloudWatchEvents*",
+            "Condition": {
+                "StringLike": {
+                    "iam:AWSServiceName": "events.amazonaws.com"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:PutMetricData",
+                "ds:CreateComputer",
+                "ds:DescribeDirectories",
+                "ec2:DescribeInstanceStatus",
+                "logs:*",
+                "ssm:*",
+                "ec2messages:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*",
+            "Condition": {
+                "StringLike": {
+                    "iam:AWSServiceName": "ssm.amazonaws.com"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:DeleteServiceLinkedRole",
+                "iam:GetServiceLinkedRoleDeletionStatus"
+            ],
+            "Resource": "arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:PutMetricData",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeTags",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "logs:DescribeLogGroups",
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter"
+            ],
+            "Resource": "arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*"
+        }
+    ]
+}
