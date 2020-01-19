@@ -80,7 +80,7 @@ airflow flower &
 ```
 #### 定义工作流
 现定义如下两个Airflow的DAG：
-- dag_transform_calpi
+- dag_transform_calpi；
 ![](https://upload-images.jianshu.io/upload_images/15523506-03550f055fb40f6b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 1. create_emr_cluster：创建EMR集群；
@@ -225,7 +225,7 @@ while flag:
             emr_client.terminate_job_flows(JobFlowIds=[i['Id']])
             flag = False
 ```
-- dag_query
+- dag_query；
 ![](https://upload-images.jianshu.io/upload_images/15523506-b07c9a3f9f4a3216.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 1. sleep_completed：外部任务，依赖于第一个DAG（dag_transform_calpi），即等待Livy会话执行下一个任务；
@@ -482,6 +482,7 @@ t1 >> t2
 
 ## 总结
 本文展现了如何使用Airflow启动EMR集群，并通过Livy远程提交任务，在任务完成后终止集群。成本节省主要体现在两个方面：1）每天在需要执行ETL工作时启动集群，任务执行完成后终止集群，因此不会出现空闲的集群；2）EMR可以配合Spot实例使用，从而节省更多的成本。另一个好处是使用Livy无需额外配置远程提交任务的服务器，并且EMR集成了Livy的一键安装，造成了极大的方便。
+
 
 
 
