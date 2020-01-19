@@ -80,8 +80,8 @@ airflow flower &
 ```
 #### 定义工作流
 现定义如下两个Airflow的DAG：
-- dag_transform_calpi；
-![](https://upload-images.jianshu.io/upload_images/15523506-03550f055fb40f6b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+- dag_transform_calpi
+  ![](https://upload-images.jianshu.io/upload_images/15523506-03550f055fb40f6b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 1. create_emr_cluster：创建EMR集群；
 ```
@@ -225,8 +225,8 @@ while flag:
             emr_client.terminate_job_flows(JobFlowIds=[i['Id']])
             flag = False
 ```
-- dag_query；
-![](https://upload-images.jianshu.io/upload_images/15523506-b07c9a3f9f4a3216.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+- dag_query
+  ![](https://upload-images.jianshu.io/upload_images/15523506-b07c9a3f9f4a3216.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 1. sleep_completed：外部任务，依赖于第一个DAG（dag_transform_calpi），即等待Livy会话执行下一个任务；
 2. transform：对之前上传到S3上的文本文件进行聚合、转换；
@@ -474,7 +474,7 @@ t1 >> t2
 - 下载middle_result中的文件，可以看到聚合结果；
 ![](https://upload-images.jianshu.io/upload_images/15523506-ed940fdec3f7c0b0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 - 下载result中的文件，可以查看到最终结果（统计编号为9的列表中包含53组数据，-1表示其他json文件没有编号为9的列表）；
-![](https://upload-images.jianshu.io/upload_images/15523506-2f71416226c853b3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  ![](https://upload-images.jianshu.io/upload_images/15523506-2f71416226c853b3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 - 任务执行完毕，发现集群自动终止；
 ![](https://upload-images.jianshu.io/upload_images/15523506-e98f80a246f65892.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 - 再查看远程服务器上Airflow的web界面，发现两个dag已经执行完毕。
