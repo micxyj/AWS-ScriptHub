@@ -83,7 +83,7 @@ airflow flower &
 - dag_transform_calpi
 ![](https://upload-images.jianshu.io/upload_images/15523506-03550f055fb40f6b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-  1. create_emr_cluster：创建EMR集群；
+1. create_emr_cluster：创建EMR集群；
 ```
 # -*- coding: UTF-8 -*-
 
@@ -152,7 +152,7 @@ if __name__ == '__main__':
             if i['Name'] == name:
                 flag = False
 ```
-  2. create_livy_session：创建Livy会话；
+2. create_livy_session：创建Livy会话；
 ```
 # -*- coding: UTF-8 -*-
 import requests
@@ -178,8 +178,8 @@ r = requests.post(livy_host + '/sessions',
                   data=json.dumps(data), headers=headers)
 pprint.pprint(r.json())
 ```
-  3. sleep：等待会话创建完成；
-  4. calpi：以batches的方式执行spark任务计算pi值；
+3. sleep：等待会话创建完成；
+4. calpi：以batches的方式执行spark任务计算pi值；
 ```
 # -*- coding: UTF-8 -*-
 import requests
@@ -206,8 +206,8 @@ data = {"file": "s3://xiaoyj/emr/spark-examples_2.11-2.4.4.jar",
 r = requests.post(batch_url, data=json.dumps(data), headers=headers)
 pprint.pprint(r.json())
 ```
-  5. query_completed：外部任务，依赖于第二个DAG（dag_query），即等待查询完成之后，执行下一个任务；
-  6. terminate_cluster：终止集群。
+5. query_completed：外部任务，依赖于第二个DAG（dag_query），即等待查询完成之后，执行下一个任务；
+6. terminate_cluster：终止集群。
 ```
 # -*- coding: UTF-8 -*-
 import boto3
@@ -228,8 +228,8 @@ while flag:
 - dag_query
 ![](https://upload-images.jianshu.io/upload_images/15523506-b07c9a3f9f4a3216.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-  1. sleep_completed：外部任务，依赖于第一个DAG（dag_transform_calpi），即等待Livy会话执行下一个任务；
-  2. transform：对之前上传到S3上的文本文件进行聚合、转换；
+1. sleep_completed：外部任务，依赖于第一个DAG（dag_transform_calpi），即等待Livy会话执行下一个任务；
+2. transform：对之前上传到S3上的文本文件进行聚合、转换；
 ```
 # -*- coding: UTF-8 -*-
 
@@ -271,7 +271,7 @@ data = {
 r = requests.post(livy_url, data=json.dumps(data), headers=headers)
 pprint.pprint(r.json())
 ```
-  3. check_s3：检查S3中是否有上一步生成的中间结果；
+3. check_s3：检查S3中是否有上一步生成的中间结果；
 ```
 # -*- coding: UTF-8 -*-
 
@@ -289,7 +289,7 @@ while flag:
         if i['Key'] == 'emr/middle_result/part-00000':
             flag = False
 ```
-  4. query：对上一步生成的中间结果进行查询。
+4. query：对上一步生成的中间结果进行查询。
 ```
 # -*- coding: UTF-8 -*-
 
@@ -482,7 +482,6 @@ t1 >> t2
 
 ## 总结
 本文展现了如何使用Airflow启动EMR集群，并通过Livy远程提交任务，在任务完成后终止集群。成本节省主要体现在两个方面：1）每天在需要执行ETL工作时启动集群，任务执行完成后终止集群，因此不会出现空闲的集群；2）EMR可以配合Spot实例使用，从而节省更多的成本。另一个好处是使用Livy无需额外配置远程提交任务的服务器，并且EMR集成了Livy的一键安装，造成了极大的方便。
-
 
 
 
