@@ -26,7 +26,7 @@ Apache Airflow是一款开源的任务调度系统，用户通过创建DAG（有
 - 本文示例所使用的区域us-east-1；
 - 在该区域创建一台EC2，并确保与EC2绑定的IAM Role有EMR集群的Full Access；
 - 拥有创建EMR集群所需的默认角色：EMR_DefaultRole与EMR_EC2_DefaultRole；
-- 创建S3桶，下载jar包[spark-examples_2.11-2.4.4](https://xiaoyj.s3.us-east-2.amazonaws.com/emr/spark-examples_2.11-2.4.4.jar)和数据集[emrdata.txt](https://xiaoyj.s3.us-east-2.amazonaws.com/emr/emrdata.txt)，并上传至s3。
+- 创建S3桶，下载jar包[spark-examples_2.11-2.4.4](https://shawnyj.s3-ap-northeast-1.amazonaws.com/spark-examples_2.11-2.4.4.jar)和数据集[emrdata.txt](https://shawnyj.s3-ap-northeast-1.amazonaws.com/emrdata.txt)，并上传至s3。
 
 ### 实现过程
 #### 在EC2上配置Airflow
