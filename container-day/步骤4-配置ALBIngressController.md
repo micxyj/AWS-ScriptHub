@@ -13,11 +13,11 @@ https://aws.amazon.com/cn/blogs/opensource/kubernetes-ingress-aws-alb-ingress-co
 > 4.2.1.1 创建EKS OIDC Provider (这个操作每个集群只需要做一次）
 
 ```bash
-eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --region ${AWS_REGION}
+eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --region ${AWS_DEFAULT_REGION}
 [ℹ]  eksctl version 0.24.0-rc.0
-[ℹ]  using region us-west-2
-[ℹ]  will create IAM Open ID Connect provider for cluster "ekslab" in "us-west-2"
-[✔]  created IAM Open ID Connect provider for cluster "ekslab" in "us-west-2"
+[ℹ]  using region us-east-1
+[ℹ]  will create IAM Open ID Connect provider for cluster "ekslab" in "us-east-1"
+[✔]  created IAM Open ID Connect provider for cluster "ekslab" in "us-east-1"
 ```
 
 > 4.2.1.2 创建所需要的IAM policy
@@ -26,10 +26,10 @@ eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --r
 > https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/iam-policy.json
 ```bash
 aws iam create-policy --policy-name ALBIngressControllerIAMPolicy \
-  --policy-document file://./alb-ingress-controller/ingress-iam-policy.json --region ${AWS_REGION}
+  --policy-document file://./alb-ingress-controller/ingress-iam-policy.json --region ${AWS_DEFAULT_REGION}
 
 # 记录返回的Plociy ARN
-POLICY_NAME=$(aws iam list-policies --query 'Policies[?PolicyName==`ALBIngressControllerIAMPolicy`].Arn' --output text --region ${AWS_REGION})
+POLICY_NAME=$(aws iam list-policies --query 'Policies[?PolicyName==`ALBIngressControllerIAMPolicy`].Arn' --output text --region ${AWS_DEFAULT_REGION})
 
 ```
 
@@ -46,7 +46,7 @@ eksctl create iamserviceaccount \
 
 参考输出
 [ℹ]  eksctl version 0.24.0-rc.0
-[ℹ]  using region us-west-2
+[ℹ]  using region us-east-1
 [ℹ]  1 iamserviceaccount (kube-system/alb-ingress-controller) was included (based on the include/exclude rules)
 [!]  metadata of serviceaccounts that exist in Kubernetes will be updated, as --override-existing-serviceaccounts was set
 [ℹ]  1 task: { 2 sequential sub-tasks: { create IAM role for serviceaccount "kube-system/alb-ingress-controller", create serviceaccount "kube-system/alb-ingress-controller" } }
@@ -141,4 +141,3 @@ kubectl get all -n 2048-game
 kubectl delete -f 2048/
 kubectl delete namespace 2048-game
 ```
-
