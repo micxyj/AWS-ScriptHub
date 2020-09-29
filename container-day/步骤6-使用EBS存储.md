@@ -2,21 +2,24 @@
 
 6.1 创建所需要的IAM policy , EKS OIDC provider, service account
 
-> 6.1.1 创建所需要的IAM policy
-[https://raw.githubusercontent.com/kubernetes-sigs/aws-ebs-csi-driver/v0.4.0/docs/example-iam-policy.json](https://raw.githubusercontent.com/kubernetes-sigs/aws-ebs-csi-driver/v0.4.0/docs/example-iam-policy.json)
+6.1.1 创建所需要的IAM policy
 
 ```bash
-#git clone https://github.com/kubernetes-sigs/aws-ebs-csi-driver.git
+#下载csi driver
+git clone https://github.com/kubernetes-sigs/aws-ebs-csi-driver.git
+
+#下载policy
+curl -sSL -o ebs-csi-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-ebs-csi-driver/v0.4.0/docs/example-iam-policy.json
 
 #创建ebs CSI 需要的IAM策略,如果报错请检查策略是否已经存在
 aws iam create-policy \
     --policy-name Amazon_EBS_CSI_Driver \
-    --policy-document file://./aws-ebs-csi-driver/ebs-csi-iam-policy.json \
-    --region ${AWS_REGION}
+    --policy-document file://ebs-csi-policy.json \
+    --region ${AWS_DEFAULT_REGION}
         
 
 #返回示例,请记录返回的Plociy ARN
-POLICY_NAME=$(aws iam list-policies --query 'Policies[?PolicyName==`Amazon_EBS_CSI_Driver`].Arn' --output text --region ${AWS_REGION})
+POLICY_NAME=$(aws iam list-policies --query 'Policies[?PolicyName==`Amazon_EBS_CSI_Driver`].Arn' --output text --region ${AWS_DEFAULT_REGION})
 ```
 
 > 6.1.2 获取EKS工作节点的IAM role
@@ -26,12 +29,11 @@ POLICY_NAME=$(aws iam list-policies --query 'Policies[?PolicyName==`Amazon_EBS_C
 kubectl -n kube-system describe configmap aws-auth
 
 # 单个节点组
-ROLE_NAME=Role-name-in-above-output
+ROLE_NAME=<Role-name-in-above-output>
 aws iam attach-role-policy --policy-arn ${POLICY_NAME} \
-    --role-name ${ROLE_NAME} --region ${AWS_REGION}
+    --role-name ${ROLE_NAME} --region ${AWS_DEFAULT_REGION}
 
-#多个节点组, 这里准备了一个脚本updaterole.sh
-sh aws-ebs-csi-driver/updaterole.sh ${POLICY_NAME}
+
 ```
 
 > 6.1.3 部署EBS CSI 驱动到eks 集群
@@ -56,6 +58,7 @@ ebs-csi-node-z86xc                        3/3     Running   0          4m5s
 6.2 部署动态卷实例应用
 
 ```bash
+#specs中定义了名为app的pod，pod中定义了pvc的存储需求，拿到卷后会挂载到/data路径下，并且每隔5s向/data路径下out.txt文本文件的添加数据
 kubectl apply -f aws-ebs-csi-driver/examples/kubernetes/dynamic-provisioning/specs/
 
 #查看storageclass
@@ -63,13 +66,12 @@ kubectl describe storageclass ebs-sc
 
 #查看示例app状态
 kubectl get pods --watch
-#查看是否有失败
-kubectl get events
 
 kubectl get pv
 PV_NAME=$(kubectl get pv -o json | jq -r '.items[0].metadata.name')
 kubectl describe persistentvolumes ${PV_NAME}
 
+#查看数据是否写成功
 kubectl exec -it app --  tail -f  /data/out.txt
 # Thu Mar 5 14:19:43 UTC 2020
 # Thu Mar 5 14:19:48 UTC 2020
