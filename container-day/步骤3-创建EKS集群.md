@@ -10,14 +10,11 @@
        --managed
  ```
 
- ![](media/15764759782724/15764761011094.jpg)
-
   查看EKS集群工作节点
   ```bash
    kubectl cluster-info
    kubectl get node
   ```
-  ![](media/15764759782724/15764762619982.jpg)
 
 3.2 (可选)部署一个测试应用
 在Cloud9创建一个nginx.yaml,内容如下
