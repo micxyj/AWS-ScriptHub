@@ -8,5 +8,4 @@
 4.  步骤四, 使用ALB Ingress
 5.  步骤五,使用Kubernetes Dashboard
 6.  步骤六,使用EBS存储
-7.  步骤七, IRSA(可选)
 
