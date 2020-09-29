@@ -71,8 +71,9 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingre
 
  ```
 
- 修改alb-ingress-controller.yaml 为以下配置
-   
+
+修改alb-ingress-controller.yaml 为以下配置
+```bash
   #为alb-ingress-controller.yaml添加以下内容（添加一行集群名称即可）
   kubectl edit deployment.apps/alb-ingress-controller -n kube-system
 
@@ -85,13 +86,15 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingre
  
  #确认ALB Ingress Controller是否工作
  kubectl get pods -n kube-system
+ ```
 
+```bash
  #参考输出
 -------------------------------------------------------------------------------
 NAME                                      READY   STATUS    RESTARTS   AGE
 alb-ingress-controller-55b5bbcb5b-bc8q9   1/1     Running   0          56s
 -------------------------------------------------------------------------------
-  ```
+```
 
 
 4.3 使用ALB Ingress，部署2048 game 
