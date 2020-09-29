@@ -20,13 +20,11 @@ eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --r
 [✔]  created IAM Open ID Connect provider for cluster "ekslab" in "us-east-1"
 ```
 
-> 4.2.1.2 创建所需要的IAM policy
-> [https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.5/docs/examples/iam-policy.json](https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.5/docs/examples/iam-policy.json) 
->
-> https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/iam-policy.json
+> 4.2.1.2 下载并创建ALB入口控制器pod所需的IAM policy
 ```bash
+curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/iam-policy.json
 aws iam create-policy --policy-name ALBIngressControllerIAMPolicy \
-  --policy-document file://./alb-ingress-controller/ingress-iam-policy.json --region ${AWS_DEFAULT_REGION}
+  --policy-document file://iam-policy.json --region ${AWS_DEFAULT_REGION}
 
 # 记录返回的Plociy ARN
 POLICY_NAME=$(aws iam list-policies --query 'Policies[?PolicyName==`ALBIngressControllerIAMPolicy`].Arn' --output text --region ${AWS_DEFAULT_REGION})
@@ -59,85 +57,65 @@ eksctl create iamserviceaccount \
 
 4.3 部署 ALB Ingress Controller
 
- 相关文件已经resource/alb-ingress-controller目录下，并且修改好，下面步骤为你全新Step-by-Step操作
-
  >4.3.1 创建 ALB Ingress Controller 所需要的RBAC
 
  ```bash
- kubectl apply -f rbac-role.yaml
+ kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/rbac-role.yaml
  
  ```
 
->4.2.2 创建 ALB Ingress Controller 配置文件
+>4.2.2 部署 ALB Ingress Controller
 
- 修改alb-ingress-controller.yaml 以下配置，参考示例 resource/alb-ingress-controller/alb-ingress-controller.yaml
-(eksctl 自动创建的 vpc 默认为 eksctl-<集群名字>-cluster/VPC)
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/alb-ingress-controller.yaml
 
-  ```bash
- #查找EKS集群使用的vpc
- aws ec2 describe-vpcs --filters "Name=tag:Name,Values=eksctl-${CLUSTER_NAME}-cluster/VPC" --query "Vpcs[0].VpcId" --out text
- 
-  
-  #修改alb-ingress-controller.yaml以下内容
-  - --cluster-name=<步骤2 创建的集群名字>
-  - --aws-vpc-id=<eksctl 创建的vpc-id>  
-  
-  #1.1.7 waf,wafv2修复方式
-  # 如果你使用alb-ingress-controller 1.1.8 需要禁用waf,wafv2
-  - --feature-gates=waf=false,wafv2=false
+ ```
 
-             
- #使用修改好的yaml文件部署ALB Ingress Controller
- kubectl apply -f alb-ingress-controller.yaml
+ 修改alb-ingress-controller.yaml 为以下配置
+   
+  #为alb-ingress-controller.yaml添加以下内容（添加一行集群名称即可）
+  kubectl edit deployment.apps/alb-ingress-controller -n kube-system
+
+      spec:
+      containers:
+      - args:
+        - --ingress-class=alb
+        - --cluster-name=<步骤2 创建的集群名字>
 
  
  #确认ALB Ingress Controller是否工作
- kubectl logs -n kube-system $(kubectl get po -n kube-system | egrep -o alb-ingress[a-zA-Z0-9-]+)
+ kubectl get pods -n kube-system
 
  #参考输出
 -------------------------------------------------------------------------------
-AWS ALB Ingress controller
-  Release:    v1.1.8
-  Build:      git-ec387ad1
-  Repository: https://github.com/kubernetes-sigs/aws-alb-ingress-controller.git
+NAME                                      READY   STATUS    RESTARTS   AGE
+alb-ingress-controller-55b5bbcb5b-bc8q9   1/1     Running   0          56s
 -------------------------------------------------------------------------------
   ```
 
 
- 4.4 使用ALB Ingress   
->4.4.1 为nginx service创建ingress
-
-```bash
-cd resource/alb-ingress-controller
-kubectl apply -f nginx-alb-ingress.yaml
-```
-
->4.4.2 验证
-
-```bash
-ALB=$(kubectl get ingress -o json | jq -r '.items[0].status.loadBalancer.ingress[].hostname')
-curl -v $ALB
-
-# 如果遇到问题，请查看日志
-kubectl logs -n kube-system $(kubectl get po -n kube-system | egrep -o alb-ingress[a-zA-Z0-9-]+)
-```
-
-> 4.4.3 清理
-```bash
-kubectl delete -f nginx-alb-ingress.yaml
-```
-
-4.5 使用ALB Ingress，部署2048 game 
+4.3 使用ALB Ingress，部署2048 game 
 
 ```bash
 
-kubectl create namespace 2048-game
-kubectl apply -f 2048/
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/2048/2048-namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/2048/2048-deployment.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/2048/2048-service.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/2048/2048-ingress.yaml
 
-#获取访问地址，在浏览器中访问2048游戏
-kubectl get all -n 2048-game
+#几分钟后，验证是否已使用以下命令创建入口资源
+kubectl get ingress/2048-ingress -n 2048-game
+
+#输出类似于
+-------------------------------------------------------------------------------
+NAME           HOSTS   ADDRESS                                                                 PORTS      AGE
+2048-ingress   *       example-2048game-2048ingr-6fa0-352729433.region-code.elb.amazonaws.com   80      24h
+-------------------------------------------------------------------------------
+#在console上观察alb状态，等到active后，在浏览器输入dns名称，看看是否能访问
 
 #清除资源
-kubectl delete -f 2048/
-kubectl delete namespace 2048-game
+kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/2048/2048-ingress.yaml
+kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/2048/2048-service.yaml
+kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/2048/2048-deployment.yaml
+kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.8/docs/examples/2048/2048-namespace.yaml
 ```
