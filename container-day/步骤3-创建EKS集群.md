@@ -5,7 +5,7 @@
  ```bash
  export CLUSTER_NAME=ekslab
  eksctl create cluster \
-       --name=$EKS_CLUSTER \
+       --name=$CLUSTER_NAME \
        --version=1.16 \
        --managed
  ```
