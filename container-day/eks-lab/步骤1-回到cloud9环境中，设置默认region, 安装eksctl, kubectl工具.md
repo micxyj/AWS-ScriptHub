@@ -1,4 +1,4 @@
-# 步骤1: 回到cloud9环境中，设置默认region, 安装eksctl, kubectl工具
+# 步骤1: 回到Cloud9环境中，设置默认region, 安装eksctl, kubectl工具
 
 我们将在之前创建的AWS Cloud9 环境里面安装eksctl,kubectl。进入Cloud9编辑器环境后，在终端中输入以下命令,进行安装。
 
