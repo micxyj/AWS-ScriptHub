@@ -11,6 +11,7 @@
  ```
 
  注意：如果报类似于以下的错：
+```bash
 [ℹ]  deploying stack "eksctl-ekslab-cluster"
 [✖]  unexpected status "ROLLBACK_IN_PROGRESS" while waiting for CloudFormation stack "eksctl-ekslab-cluster"
 [ℹ]  fetching stack events in attempt to troubleshoot the root cause of the failure
@@ -25,6 +26,7 @@
 [ℹ]  to cleanup resources, run 'eksctl delete cluster --region=us-east-1 --name=ekslab'
 [✖]  waiting for CloudFormation stack "eksctl-ekslab-cluster": ResourceNotReady: failed waiting for successful resource state
 Error: failed to create cluster "ekslab"
+```
 
 则表示该可用区控制层面实例容量已达上限，请使用错误消息中建议的可用区，先删除之前失败的堆栈，再创建集群：
 ```bash
