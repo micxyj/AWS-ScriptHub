@@ -94,7 +94,7 @@ kubectl apply -f nginx.yaml
 kubectl get deploy
 kubectl get svc
 
-#测试
+#待nlb状态为active，目标组健康状况检查通过后进行测试
 ELB=$(kubectl get svc service-nginx -o json |  jq -r '.status.loadBalancer.ingress[].hostname')
 echo $ELB
 curl $ELB

@@ -74,14 +74,14 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingre
 
 修改alb-ingress-controller.yaml 为以下配置
 ```bash
-  #为alb-ingress-controller.yaml添加以下内容（添加一行集群名称即可）
+  #为alb-ingress-controller.yaml添加以下内容（在--ingress-class下添加集群名称即可，注意不要用tab进行缩进）
   kubectl edit deployment.apps/alb-ingress-controller -n kube-system
 
       spec:
-      containers:
-      - args:
-        - --ingress-class=alb
-        - --cluster-name=<步骤2 创建的集群名字>
+        containers:
+        - args:
+          - --ingress-class=alb
+          - --cluster-name=<步骤2 创建的集群名字>
 
  
  #确认ALB Ingress Controller是否工作
