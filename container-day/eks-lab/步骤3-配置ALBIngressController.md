@@ -1,4 +1,4 @@
-# 步骤4 配置ALB Ingress Controller
+# 步骤3 配置ALB Ingress Controller
 
 4. 1使用ALB Ingress Controller
 

@@ -1,4 +1,4 @@
-# 步骤3: 创建EKS集群
+# 步骤2: 创建EKS集群
 
 3.1 打开Cloud9终端管理控制台， 使用eksctl 创建EKS集群(操作需要10-15分钟),该命令同时会创建一个使用t3.small的受管节点组。(这里需要check 一下eventengine默认的ec2 limit)
 

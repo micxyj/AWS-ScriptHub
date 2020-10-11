@@ -1,4 +1,4 @@
-# 步骤5 部署官方的Kubernetes dashboard
+# 步骤4 部署官方的Kubernetes dashboard
 
 5.1 下载配置文件
 

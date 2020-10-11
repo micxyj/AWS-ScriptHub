@@ -1,4 +1,4 @@
-# 步骤6 配置使用EBS CSI
+# 步骤5 配置使用EBS CSI
 
 6.1 创建所需要的IAM policy , EKS OIDC provider, service account
 
