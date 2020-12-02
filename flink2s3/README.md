@@ -68,8 +68,8 @@ bin/flink run -m yarn-cluster -yjm 1024 -ytm 1024 ./examples/batch/WordCount.jar
 [Image: image.png]
 ### 4. flink2s3打包及运行
 
-mvn clean package -Pbuild-jar
-bin/flink run -m yarn-cluster -yjm 1024 -ytm 1024 -c org.myorg.quickstart.StreamingJob quickstart-0.1.jar
+- mvn clean package -Pbuild-jar
+- bin/flink run -m yarn-cluster -yjm 1024 -ytm 1024 -c org.myorg.quickstart.StreamingJob quickstart-0.1.jar
 
 
 
