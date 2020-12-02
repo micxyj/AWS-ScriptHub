@@ -12,7 +12,7 @@ python3 audio2srt.py reinventvideotesting 2/ 10 9 &
 
 **注意：**
 1、如果存在嵌套路径，须写入所有前缀，并且路径必须以‘/’结尾
-![1](./iamge1.png)
+![avatar](iamge1.png)
 如图所示，若想对目录2下的666子目录中的视频执行操作，运行命令如下：
 python3 audio2srt.py reinventvideotesting 2/666/ 10 9 &
 
@@ -24,13 +24,13 @@ python3 audio2srt.py reinventvideotesting 2/666/ 10 9 &
 ### 2. 输出结果示例
 
 执行完脚本后，结果全部在reinvent_clip路径当中（剪切后的视频与srt文件），如下图所示：
-![2](./iamge2.png)
+![avatar](iamge2.png)
 
 点击进入路径中，其中结果文件的路径名称会和原视频所在路径名称一一对应（包括子目录中的文件）
 
-![3](./iamge3.png)
+![avatar](iamge3.png)
 
-![4](./iamge4.png)
+![avatar](iamge4.png)
 
 ### 3. 提示
 
@@ -40,7 +40,7 @@ python3 audio2srt.py reinventvideotesting 2/666/ 10 9 &
 * 在命令行输入tail -f job-logging-2020-11-27-10:36:57.352974.log，会持续监控打印任务状态（使用ctrl + c退出监控）
 
 当日志文件最后一行输出是“Audio to srt task complete”，代表audio2srt任务执行完成（若有文件失败，所有失败的文件会被打印在日志末尾），如下图所示：
-![5](./iamge5.png)
+![avatar](iamge5.png)
 
 
 
