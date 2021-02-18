@@ -1,0 +1,221 @@
+{
+    "StartAt": "Create_A_Cluster",
+    "States": {
+        "Create_A_Cluster": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::elasticmapreduce:createCluster.sync",
+            "Parameters": {
+                "Name": "WorkflowCluster",
+                "StepConcurrencyLevel": 2,
+                "VisibleToAllUsers": true,
+                "ReleaseLabel": "emr-5.28.1",
+                "Applications": [
+                    {
+                        "Name": "Spark"
+                    }
+                ],
+                "ServiceRole": "EMR_DefaultRole",
+                "JobFlowRole": "EMR_EC2_DefaultRole",
+                "LogUri": "s3://aws-logs-851108988172-us-east-1/elasticmapreduce/",
+                "Instances": {
+                    "KeepJobFlowAliveWhenNoSteps": true,
+                    "InstanceFleets": [
+                        {
+                            "InstanceFleetType": "MASTER",
+                            "TargetSpotCapacity": 1,
+                            "InstanceTypeConfigs": [
+                                {
+                                    "InstanceType": "m4.xlarge",
+                                    "BidPriceAsPercentageOfOnDemandPrice": 90
+                                }
+                            ]
+                        },
+                        {
+                            "InstanceFleetType": "CORE",
+                            "TargetSpotCapacity": 1,
+                            "InstanceTypeConfigs": [
+                                {
+                                    "InstanceType": "m4.xlarge",
+                                    "BidPriceAsPercentageOfOnDemandPrice": 90
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "IntervalSeconds": 5,
+                    "MaxAttempts": 1,
+                    "BackoffRate": 2.5
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail_Cluster"
+                }
+            ],
+            "ResultPath": "$.cluster",
+            "OutputPath": "$.cluster",
+            "Next": "Add_Steps_Parallel"
+        },
+        "Fail_Cluster": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::sns:publish",
+            "Parameters": {
+                "TopicArn": "arn:aws:sns:us-east-1:851108988172:sfn-emr",
+                "Message.$": "$.Cause"
+            },
+            "Next": "Terminate_Cluster"
+        },
+        "Add_Steps_Parallel": {
+            "Type": "Parallel",
+            "Branches": [
+                {
+                    "StartAt": "Step_One",
+                    "States": {
+                        "Step_One": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:states:::elasticmapreduce:addStep.sync",
+                            "Parameters": {
+                                "ClusterId.$": "$.ClusterId",
+                                "Step": {
+                                    "Name": "The first step",
+                                    "ActionOnFailure": "CONTINUE",
+                                    "HadoopJarStep": {
+                                        "Jar": "command-runner.jar",
+                                        "Args": [
+                                            "spark-submit",
+                                            "--class",
+                                            "org.apache.spark.examples.SparkPi",
+                                            "s3://xiaoyj/emr/spark-examples_2.11-2.4.4.jar"
+                                        ]
+                                    }
+                                }
+                            },
+                            "Retry": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "IntervalSeconds": 5,
+                                    "MaxAttempts": 1,
+                                    "BackoffRate": 2.5
+                                }
+                            ],
+                            "Catch": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "ResultPath": "$.err_mgs",
+                                    "Next": "Fail_SNS"
+                                }
+                            ],
+                            "ResultPath": "$.step1",
+                            "End": true
+                        },
+                        "Fail_SNS": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:states:::sns:publish",
+                            "Parameters": {
+                                "TopicArn": "arn:aws:sns:us-east-1:851108988172:sfn-emr",
+                                "Message.$": "$.err_mgs.Cause"
+                            },
+                            "ResultPath": "$.fail_cluster",
+                            "Next": "Terminate_Cluster_1"
+                        },
+                        "Terminate_Cluster_1": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:states:::elasticmapreduce:terminateCluster.sync",
+                            "Parameters": {
+                                "ClusterId.$": "$.ClusterId"
+                            },
+                            "End": true
+                        }
+                    }
+                },
+                {
+                    "StartAt": "Step_Two",
+                    "States": {
+                        "Step_Two": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:states:::elasticmapreduce:addStep",
+                            "Parameters": {
+                                "ClusterId.$": "$.ClusterId",
+                                "Step": {
+                                    "Name": "The second step",
+                                    "ActionOnFailure": "CONTINUE",
+                                    "HadoopJarStep": {
+                                        "Jar": "command-runner.jar",
+                                        "Args": [
+                                            "spark-submit",
+                                            "--class",
+                                            "org.apache.spark.examples.SparkPi",
+                                            "s3://xiaoyj/emr/spark-examples_2.11-2.4.4.jar"
+                                        ]
+                                    }
+                                }
+                            },
+                            "Retry": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "IntervalSeconds": 5,
+                                    "MaxAttempts": 1,
+                                    "BackoffRate": 2.5
+                                }
+                            ],
+                            "Catch": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "ResultPath": "$.err_mgs_1",
+                                    "Next": "Fail_SNS_1"
+                                }
+                            ],
+                            "ResultPath": "$.step2",
+                            "End": true
+                        },
+                        "Fail_SNS_1": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:states:::sns:publish",
+                            "Parameters": {
+                                "TopicArn": "arn:aws:sns:us-east-1:851108988172:sfn-emr",
+                                "Message.$": "$.err_mgs_1.Cause"
+                            },
+                            "ResultPath": "$.fail_cluster_1",
+                            "Next": "Terminate_Cluster_2"
+                        },
+                        "Terminate_Cluster_2": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:states:::elasticmapreduce:terminateCluster.sync",
+                            "Parameters": {
+                                "ClusterId.$": "$.ClusterId"
+                            },
+                            "End": true
+                        }
+                    }
+                }
+            ],
+            "ResultPath": "$.steps",
+            "Next": "Terminate_Cluster"
+        },
+        "Terminate_Cluster": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::elasticmapreduce:terminateCluster.sync",
+            "Parameters": {
+                "ClusterId.$": "$.ClusterId"
+            },
+            "End": true
+        }
+    }
+}
