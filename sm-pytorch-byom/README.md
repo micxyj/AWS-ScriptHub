@@ -1,4 +1,5 @@
 # 在SageMaker上使用BYOM部署Pytorch Serving
+- 将my_model，comic.png与gan_serving_test.ipynb文件上传至SageMaker环境中
 - 将已打包好的模型文件model.tar.gz上传到S3
 - 修改gan_serving_test.ipynb笔记本中model_s3_path参数为上一步S3中模型文件的路径
-- 按照顺序执行notebook中的代码
+- 在SageMaker环境中，打开gan_serving_test.ipynb，按照顺序执行notebook中的代码
